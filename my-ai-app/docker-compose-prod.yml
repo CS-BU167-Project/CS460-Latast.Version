@@ -1,0 +1,39 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: production
+    image: my-ai-app-frontend:latest
+    ports:
+      - "3001:3000"
+    environment:
+      - VITE_API_URL=http://backend:8000
+    networks:
+      - my-ai-app-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    image: my-ai-app-backend:latest
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    networks:
+      - my-ai-app-network
+    restart: unless-stopped
+
+networks:
+  my-ai-app-network:
+    driver: bridge
+    name: my-ai-app-network

@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+trafilatura
+openai
+python-dotenv
